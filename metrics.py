@@ -1,4 +1,5 @@
 import time
+from threading import Lock
 
 from prometheus_client import Gauge
 
@@ -6,6 +7,7 @@ METRICS_PREFIX = 'hitcounter'
 
 cached_data = None
 last_fetched = 0
+lock = Lock()
 
 
 def init_metrics(db_connection):
@@ -18,7 +20,9 @@ def init_metrics(db_connection):
 
 
 def resolve_label_count(db, site, path):
-    global cached_data, last_fetched
+    global lock, cached_data, last_fetched
+
+    lock.acquire()
 
     if time.monotonic() - last_fetched >= 5:
         cached_data = db.getTopUrls(db.get_connection(), -1)
@@ -26,7 +30,10 @@ def resolve_label_count(db, site, path):
 
     url = f'{site}/{path}'
     if url not in cached_data['values']:
+        lock.release()
         return 0
+
+    lock.release()
     return cached_data['values'][url]
 
 
