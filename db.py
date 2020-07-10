@@ -71,7 +71,7 @@ class DbAccess:
         """ Get the top urls using this tool by hits. Ignore specified domains """
         # Select all urls and counts
         cursor = connection.cursor()
-        cursor.execute('select url, count from url')
+        cursor.execute(f'select url, count from url order by count desc limit {amount + len(config.TOP_SITES_IGNORE_DOMAIN_RE_MATCH)}')
         urls_and_counts = cursor.fetchall()
 
         # Get total hits per url
