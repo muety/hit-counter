@@ -1,5 +1,5 @@
 # Location of database
-DATABASE_FILENAME = 'data.db'
+DATABASE_FILENAME = 'data/data.db'
 
 # Amount of time before another view by the same user will count
 COOKIE_TIMEOUT = 60 * 5
