@@ -39,4 +39,5 @@ TOP_SITES_IGNORE_DOMAIN_RE_MATCH = [
 # Whitelist of URL patterns to track
 # Any URL will be allowed if list is empty
 URL_WHITELIST_RE = [
+    f'github\.com\/muety'
 ]
