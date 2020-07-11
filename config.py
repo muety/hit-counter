@@ -30,7 +30,7 @@ CANNOT_FIND_URL_MESSAGE = "Could not find a requested url"
 ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
 
 # Whether or not to export Prometheus metrics
-EXPOSE_METRICS = False
+EXPOSE_METRICS = os.getenv('EXPOSE_METRICS', 'false').lower() == 'true'
 
 # Show top n domains on front page
 NUM_TOP_DOMAINS = int(os.getenv('NUM_TOP_DOMAINS', '10'))
