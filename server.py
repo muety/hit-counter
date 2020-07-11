@@ -14,10 +14,11 @@ if config.ENABLE_SSL:
     sslify = SSLify(app)
 
 # Metrics
-init_metrics(db_connection)
-app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
-    '/metrics': make_wsgi_app()
-})
+if config.EXPOSE_METRICS:
+    init_metrics(db_connection)
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+        '/metrics': make_wsgi_app()
+    })
 
 
 def makeTextRequest(count, url, cookie_required):
