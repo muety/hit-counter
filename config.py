@@ -30,7 +30,7 @@ CANNOT_FIND_URL_MESSAGE = "Could not find a requested url"
 ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
 
 # Whether or not to export Prometheus metrics
-EXPOSE_METRICS = False
+EXPOSE_METRICS = os.getenv('EXPOSE_METRICS', 'false').lower() == 'true'
 
 # Regular expressions to ignore when getting top sites
 TOP_SITES_IGNORE_DOMAIN_RE_MATCH = [r'192\.168\.\d{1,3}\.\d{1,3}', r'127\.0\.\d{1,3}\.\d{1,3}', r'^$']
