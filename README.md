@@ -92,6 +92,7 @@ from server import app as application
 
 ## Server Configuration
 - Enable SSL: Set an environment variable `ENABLE_SSL` to `true`.
+- Enable [Prometheus](https://prometheus.io) metrics: Set an environment variable `EXPOSE_METRICS` to `true`
 - Change Database location: Set an environment variable `DATABASE_FILE_PATH` to the file path of the database. 
 
 > Alternatively these config values can be manually set in `config.py`.

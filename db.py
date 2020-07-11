@@ -48,7 +48,7 @@ class DbAccess:
 
     def getTopSites(self, connection, amount=10):
         """ Get the top domains using this tool by hits. Ignore specified domains """
-        top_urls = self.getTopUrls(connection, -1)
+        top_urls = self.getTopUrls(connection, None)
 
         # Get total hits per domain
         site_counts = defaultdict(int)
@@ -76,7 +76,7 @@ class DbAccess:
         cursor.execute(f'select url, count from url order by count desc limit {amount + len(config.TOP_SITES_IGNORE_DOMAIN_RE_MATCH)}')
         urls_and_counts = cursor.fetchall()
 
-        # Get total hits per domain
+        # Get total hits per url
         url_counts = defaultdict(int)
         for row in urls_and_counts:
             url = row[0]
@@ -85,18 +85,19 @@ class DbAccess:
             # Check if url is on the ignore list
             on_ignore = False
             for regex in config.TOP_SITES_IGNORE_DOMAIN_RE_MATCH:
-                if re.match(regex, url) is not None:
+                # Only match against the domain part
+                if re.match(regex, url.split()[0]) is not None:
                     on_ignore = True
                     break
             if on_ignore:
                 continue
-            # Add hit counts to the domain
+            # Add hit counts to the url
             url_counts[row[0]] += row[1]
 
         # Sort the urls by hits
         sorted_urls = sorted(url_counts, key=lambda x: url_counts[x], reverse=True)
 
-        # Return sorted domains and their values, this allows for lower Python version support
+        # Return sorted urls and their values, this allows for lower Python version support
         return {
             'urls': sorted_urls[:amount],
             'values': {url: url_counts[url] for url in url_counts}
