@@ -1,3 +1,2 @@
 Flask
 flask_sslify
-prometheus_client

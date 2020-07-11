@@ -1,8 +1,13 @@
+import os
+
 # Location of database
-DATABASE_FILENAME = 'data/data.db'
+DATABASE_FILE_PATH = os.path.abspath(os.getenv('DATABASE_FILE_PATH', 'data.db'))
 
 # Amount of time before another view by the same user will count
 COOKIE_TIMEOUT = 60 * 5
+
+# Length of cookie value (stored client side). Literally just the cookie size.
+COOKIE_RANDOM_VALUE_LENGTH = 12
 
 # Template of SVG with {count} to be provided
 SVG_TEMPLATE = """<?xml version="1.0"?>
@@ -18,8 +23,8 @@ SVG_TEMPLATE = """<?xml version="1.0"?>
 <!-- This count is for the url: {url} -->
 </svg>"""
 
-# Length of cookie value (stored client side). Literally just the cookie size.
-RANDOM_VALUE_LENGTH = 12
+# Enable SSL (set ENABLE_SSL=true to enable)
+ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
 
 # Message to return on a 404
 CANNOT_FIND_URL_MESSAGE = "Count not find a requested url"
@@ -27,13 +32,11 @@ CANNOT_FIND_URL_MESSAGE = "Count not find a requested url"
 # Message to return on a 403
 FORBIDDEN_URL_MESSAGE = "Requested url is not whitelisted"
 
-# Enable SSL
-ENABLE_SSL = False
-
 # Regular expressions to ignore when getting top sites
 TOP_SITES_IGNORE_DOMAIN_RE_MATCH = [
     r'192\.168\.\d{1,3}\.\d{1,3}',
-    r'127\.0\.\d{1,3}\.\d{1,3}', r'^$'
+    r'127\.0\.\d{1,3}\.\d{1,3}',
+    r'^$'
 ]
 
 # Whitelist of URL patterns to track
