@@ -29,5 +29,11 @@ CANNOT_FIND_URL_MESSAGE = "Could not find a requested url"
 # Enable SSL (set ENABLE_SSL=true to enable)
 ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
 
+# Show top n domains on front page
+NUM_TOP_DOMAINS = int(os.getenv('NUM_TOP_DOMAINS', '10'))
+
+# Show top n URLs on front page
+NUM_TOP_URLS = int(os.getenv('NUM_TOP_URLS', '0'))
+
 # Regular expressions to ignore when getting top sites
 TOP_SITES_IGNORE_DOMAIN_RE_MATCH = [r'192\.168\.\d{1,3}\.\d{1,3}', r'127\.0\.\d{1,3}\.\d{1,3}', r'^$']
