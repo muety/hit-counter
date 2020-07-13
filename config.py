@@ -32,6 +32,9 @@ ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
 # Whether or not to export Prometheus metrics
 EXPOSE_METRICS = os.getenv('EXPOSE_METRICS', 'false').lower() == 'true'
 
+# Prefix for Prometheus metrics
+METRICS_PREFIX = os.getenv('METRICS_PREFIX', 'hitcounter')
+
 # Show top n domains on front page
 NUM_TOP_DOMAINS = int(os.getenv('NUM_TOP_DOMAINS', '10'))
 
