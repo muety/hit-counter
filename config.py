@@ -33,7 +33,7 @@ CANNOT_FIND_URL_MESSAGE = "Count not find a requested url"
 FORBIDDEN_URL_MESSAGE = "Requested url is not whitelisted"
 
 # Whether or not to export Prometheus metrics
-EXPOSE_METRICS = os.getenv('EXPOSE_METRICS', 'false').lower() == 'true'
+EXPOSE_METRICS = os.getenv('EXPOSE_METRICS', 'true').lower() == 'true'
 
 # Prefix for Prometheus metrics
 METRICS_PREFIX = os.getenv('METRICS_PREFIX', 'hitcounter')
@@ -42,7 +42,7 @@ METRICS_PREFIX = os.getenv('METRICS_PREFIX', 'hitcounter')
 NUM_TOP_DOMAINS = int(os.getenv('NUM_TOP_DOMAINS', '10'))
 
 # Show top n URLs on front page
-NUM_TOP_URLS = int(os.getenv('NUM_TOP_URLS', '0'))
+NUM_TOP_URLS = int(os.getenv('NUM_TOP_URLS', '10'))
 
 # Regular expressions to ignore when getting top sites
 TOP_SITES_IGNORE_DOMAIN_RE_MATCH = [
