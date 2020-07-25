@@ -58,14 +58,6 @@ def home_route():
 @utils.get_and_validate_url
 def count_raw_route(url):
     """ Return the count for a url and add 1 to it """
-    # Attempt to find any sign of a url, return 404 if we can't find anything
-    url = utils.getURL(request)
-    if url is None:
-        return config.CANNOT_FIND_URL_MESSAGE, 404
-
-    if not utils.checkURLWhitelist(url):
-        return config.FORBIDDEN_URL_MESSAGE, 403
-
     # Get/generate cookie, cleanup views, add a view, get the count and commit changes
     valid_cookie = utils.check_valid_cookie(request, url)
     connection = db_connection.get_connection()
@@ -80,14 +72,7 @@ def count_raw_route(url):
 @utils.get_and_validate_url
 def count_tag_route(url):
     """ Return svg of count and add 1 to url """
-    url = utils.getURL(request)
-    if url is None:
-        return config.CANNOT_FIND_URL_MESSAGE, 404
-
-    if not utils.checkURLWhitelist(url):
-        return config.FORBIDDEN_URL_MESSAGE, 403
-
-    valid_cookie = utils.checkValidCookie(request, url)
+    valid_cookie = utils.check_valid_cookie(request, url)
     connection = db_connection.get_connection()
     if not valid_cookie:
         db_connection.add_view(connection, url)
@@ -100,13 +85,6 @@ def count_tag_route(url):
 @utils.get_and_validate_url
 def no_count_raw_route(url):
     """ Return the count for a url """
-    url = utils.getURL(request)
-    if url is None:
-        return config.CANNOT_FIND_URL_MESSAGE, 404
-
-    if not utils.checkURLWhitelist(url):
-        return config.FORBIDDEN_URL_MESSAGE, 403
-
     connection = db_connection.get_connection()
     count = db_connection.get_count(connection, url)
 
@@ -117,13 +95,6 @@ def no_count_raw_route(url):
 @utils.get_and_validate_url
 def no_count_tag_route(url):
     """ Return svg of count """
-    url = utils.getURL(request)
-    if url is None:
-        return config.CANNOT_FIND_URL_MESSAGE, 404
-
-    if not utils.checkURLWhitelist(url):
-        return config.FORBIDDEN_URL_MESSAGE, 403
-
     connection = db_connection.get_connection()
     count = db_connection.get_count(connection, url)
 
