@@ -26,23 +26,23 @@ SVG_TEMPLATE = """<?xml version="1.0"?>
 # Enable SSL (set ENABLE_SSL=true to enable)
 ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
 
+# Whether or not to export Prometheus metrics
+EXPOSE_METRICS = os.getenv('EXPOSE_METRICS', 'false').lower() == 'true'
+
+# Prefix for Prometheus metrics
+METRICS_PREFIX = os.getenv('METRICS_PREFIX', 'hitcounter')
+
 # Message to return on a 404
 CANNOT_FIND_URL_MESSAGE = "Count not find a requested url"
 
 # Message to return on a 403
 FORBIDDEN_URL_MESSAGE = "Requested url is not whitelisted"
 
-# Whether or not to export Prometheus metrics
-EXPOSE_METRICS = os.getenv('EXPOSE_METRICS', 'true').lower() == 'true'
-
-# Prefix for Prometheus metrics
-METRICS_PREFIX = os.getenv('METRICS_PREFIX', 'hitcounter')
-
 # Show top n domains on front page
 NUM_TOP_DOMAINS = int(os.getenv('NUM_TOP_DOMAINS', '10'))
 
 # Show top n URLs on front page
-NUM_TOP_URLS = int(os.getenv('NUM_TOP_URLS', '10'))
+NUM_TOP_URLS = int(os.getenv('NUM_TOP_URLS', '0'))
 
 # Regular expressions to ignore when getting top sites
 TOP_SITES_IGNORE_DOMAIN_RE_MATCH = [

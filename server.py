@@ -1,10 +1,9 @@
+from flask import Flask, request, make_response, render_template
+
 import config
 import db
 import utils
-from flask import Flask, request, make_response, render_template
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from prometheus_client import make_wsgi_app
-from metrics import init_metrics
+
 
 app = Flask(__name__, static_url_path='')
 db_connection = db.DbAccess(config.DATABASE_FILE_PATH)
@@ -13,44 +12,51 @@ if config.ENABLE_SSL:
     from flask_sslify import SSLify
     sslify = SSLify(app)
 
-# Metrics
+# Prometheus metrics
 if config.EXPOSE_METRICS:
+    from prometheus_client import make_wsgi_app
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+    from metrics import init_metrics
     init_metrics(db_connection)
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
         '/metrics': make_wsgi_app()
     })
 
 
-def makeTextRequest(count, url, cookie_required):
+def make_text_response(count, url, cookie_required):
     """ Create a request with the count with a 200 status and give cookie back """
     response = make_response(str(count), 200)
     if cookie_required:
-        response.set_cookie(url, utils.getCookieValueToSet(), expires=utils.getExpiration())
+        response.set_cookie(url, utils.get_cookie_value_to_set(), expires=utils.get_expiration())
     return response
 
-def makeSVGRequest(count, url, cookie_required):
-    sizes = utils.calculateSVGSizes(count)
-    svg = utils.getSVG(count, sizes['width'], sizes['recWidth'], sizes['textX'], url).encode('utf-8')
+
+def make_svg_response(count, url, cookie_required):
+    sizes = utils.calculate_svg_sizes(count)
+    svg = utils.get_svg(count, sizes['width'], sizes['recWidth'], sizes['textX'], url).encode('utf-8')
     response = make_response(svg, 200)
     response.content_type = 'image/svg+xml'
     if cookie_required:
-        response.set_cookie(url, utils.getCookieValueToSet(), expires=utils.getExpiration())
+        response.set_cookie(url, utils.get_cookie_value_to_set(), expires=utils.get_expiration())
     return response
 
+
 @app.route("/")
-def homeRoute():
+def home_route():
     """ Home + tool to create (nocount/count + url in url) """
     connection = db_connection.get_connection()
     return render_template(
         'index.html',
-        top_sites=db_connection.getTopSites(connection, config.NUM_TOP_DOMAINS),
-        top_urls=db_connection.getTopUrls(connection, config.NUM_TOP_URLS),
-        show_sites=config.NUM_TOP_DOMAINS > 0,
-        show_urls=config.NUM_TOP_URLS > 0
+        top_domains=db_connection.get_top_sites(connection, config.NUM_TOP_DOMAINS),
+        top_urls=db_connection.get_top_urls(connection, config.NUM_TOP_URLS),
+        top_domain_amount=config.NUM_TOP_DOMAINS,
+        top_url_amount=config.NUM_TOP_URLS
     )
 
-@app.route("/count")
-def countRoute():
+
+@app.route("/count", endpoint="count_raw_route")
+@utils.get_and_validate_url
+def count_raw_route(url):
     """ Return the count for a url and add 1 to it """
     # Attempt to find any sign of a url, return 404 if we can't find anything
     url = utils.getURL(request)
@@ -61,16 +67,18 @@ def countRoute():
         return config.FORBIDDEN_URL_MESSAGE, 403
 
     # Get/generate cookie, cleanup views, add a view, get the count and commit changes
-    valid_cookie = utils.checkValidCookie(request, url)
+    valid_cookie = utils.check_valid_cookie(request, url)
     connection = db_connection.get_connection()
     if not valid_cookie:
-        db_connection.addView(connection, url)
-    count = db_connection.getCount(connection, url)
+        db_connection.add_view(connection, url)
+    count = db_connection.get_count(connection, url)
 
-    return makeTextRequest(count, url, not valid_cookie)
+    return make_text_response(count, url, not valid_cookie)
 
-@app.route("/count/tag.svg")
-def countTagRoute():
+
+@app.route("/count/tag.svg", endpoint="count_tag_route")
+@utils.get_and_validate_url
+def count_tag_route(url):
     """ Return svg of count and add 1 to url """
     url = utils.getURL(request)
     if url is None:
@@ -82,13 +90,15 @@ def countTagRoute():
     valid_cookie = utils.checkValidCookie(request, url)
     connection = db_connection.get_connection()
     if not valid_cookie:
-        db_connection.addView(connection, url)
-    count = db_connection.getCount(connection, url)
+        db_connection.add_view(connection, url)
+    count = db_connection.get_count(connection, url)
 
-    return makeSVGRequest(count, url, not valid_cookie)
+    return make_svg_response(count, url, not valid_cookie)
 
-@app.route("/nocount")
-def nocountRoute():
+
+@app.route("/nocount", endpoint="no_count_raw_route")
+@utils.get_and_validate_url
+def no_count_raw_route(url):
     """ Return the count for a url """
     url = utils.getURL(request)
     if url is None:
@@ -98,12 +108,14 @@ def nocountRoute():
         return config.FORBIDDEN_URL_MESSAGE, 403
 
     connection = db_connection.get_connection()
-    count = db_connection.getCount(connection, url)
+    count = db_connection.get_count(connection, url)
 
-    return makeTextRequest(count, url, False)
+    return make_text_response(count, url, False)
 
-@app.route("/nocount/tag.svg")
-def nocountTagRoute():
+
+@app.route("/nocount/tag.svg", endpoint="no_count_tag_route")
+@utils.get_and_validate_url
+def no_count_tag_route(url):
     """ Return svg of count """
     url = utils.getURL(request)
     if url is None:
@@ -113,9 +125,10 @@ def nocountTagRoute():
         return config.FORBIDDEN_URL_MESSAGE, 403
 
     connection = db_connection.get_connection()
-    count = db_connection.getCount(connection, url)
+    count = db_connection.get_count(connection, url)
 
-    return makeSVGRequest(count, url, False)
+    return make_svg_response(count, url, False)
+
 
 @app.after_request
 def add_header(r):
@@ -128,6 +141,7 @@ def add_header(r):
     r.headers["Expires"] = "0"
     r.headers["Access-Control-Allow-Origin"] = '*'
     return r
+
 
 if __name__ == '__main__':
     ip = '0.0.0.0'
